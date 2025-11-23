@@ -1,0 +1,42 @@
+.baseButton {
+    width: 100%;
+    padding: 14px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    /* 為了放絕對定位的 icon */
+    transition: opacity 0.2s, background-color 0.2s;
+    border: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background-color: transparent;
+    border: 1px solid #555;
+    /* 灰色邊框 */
+    color: white;
+    margin-bottom: 12px;
+    /* 按鈕之間的距離 */
+}
+
+.baseButton:active {
+    transform: scale(0.98);
+}
+
+.baseButton:hover {
+    border-color: #fff;
+    /* hover 時邊框變白 */
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Icon 的樣式：絕對定位在左側 */
+.icon {
+    position: absolute;
+    left: 20px;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+}

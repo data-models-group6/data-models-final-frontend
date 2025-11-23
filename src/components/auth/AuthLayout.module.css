@@ -1,0 +1,21 @@
+.layoutContainer {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #121212;
+  color: white;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.contentArea {
+  width: 100%;
+  padding: 0 24px;
+  max-width: 500px;
+  margin: 0 auto;
+
+  display: flex;
+  flex-direction: column;
+}

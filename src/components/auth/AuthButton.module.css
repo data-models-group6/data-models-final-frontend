@@ -1,0 +1,37 @@
+.baseButton {
+  width: 100%;
+  padding: 14px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #57b65f;
+  color: white;
+  transition: opacity 0.2s, background-color 0.2s;
+  border: none;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.baseButton:active {
+  transform: scale(0.98);
+}
+
+.baseButton:hover {
+  background-color: rgb(93, 160, 83);
+}
+
+/* --- 變體 2: 社群邊框按鈕 --- */
+.social {
+  background-color: transparent;
+  border: 1px solid #555; /* 灰色邊框 */
+  color: white;
+  margin-bottom: 12px; /* 按鈕之間的距離 */
+}
+.social:hover {
+  border-color: #fff; /* hover 時邊框變白 */
+  background-color: rgba(255, 255, 255, 0.05);
+}

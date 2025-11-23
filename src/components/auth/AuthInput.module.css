@@ -1,0 +1,32 @@
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  /* margin-bottom: 20px; */
+}
+
+.label {
+  color: white;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.inputField {
+  width: 100%;
+  background-color: #414141;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 14px;
+  color: white;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.inputField:focus {
+  border-color: #57B65F;
+}
+
+.inputField::placeholder {
+  color: #FFFFFF80;
+}
