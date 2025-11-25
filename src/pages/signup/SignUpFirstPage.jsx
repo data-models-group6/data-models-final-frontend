@@ -1,11 +1,11 @@
-import AuthInput from "../components/auth/AuthInput";
-import AuthButton from "../components/auth/AuthButton";
+import AuthInput from "../../components/auth/AuthInput";
+import AuthButton from "../../components/auth/AuthButton";
 import { FaChevronLeft } from "react-icons/fa";
-import classes from "./SignUp.module.css";
+import classes from "./SignUpFirstPage.module.css";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-function SignUp() {
+function SignUpFirstPage() {
     const navigate = useNavigate();
 
     const [password, setPassword] = useState("");
@@ -52,9 +52,9 @@ function SignUp() {
                 {showConfirmError && "Passwords do not match."}
             </div>
             <div className={classes.sizedBox12}></div>
-            <AuthButton label="Continue" />
+            <AuthButton label="Continue" onClick={() => navigate("/auth/signup/gender")} />
         </div>
     );
 }
 
-export default SignUp;
+export default SignUpFirstPage;

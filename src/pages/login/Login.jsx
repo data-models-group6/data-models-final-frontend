@@ -1,6 +1,6 @@
-import AuthInput from "../components/auth/AuthInput";
-import AuthButton from "../components/auth/AuthButton";
-import AuthSocialButton from "../components/auth/AuthSocialButton";
+import AuthInput from "../../components/auth/AuthInput";
+import AuthButton from "../../components/auth/AuthButton";
+import AuthSocialButton from "../../components/auth/AuthSocialButton";
 import { FaApple, FaFacebook } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import classes from "./Login.module.css";
@@ -19,7 +19,7 @@ function Login() {
             <div className={classes.hint}>
                 
             </div>
-            <AuthButton label="Log in" />
+            <AuthButton label="Log in" onClick={() => navigate("/authorization/")}/>
             <div className={classes.dividerWrapper}>
                 <div className={classes.line}></div>
                 <span className={classes.orText}>or</span>
