@@ -1,0 +1,49 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: calc(100dvh - 48px);
+  align-items: center;
+}
+
+.contentWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.title {
+  color: white;
+  font-size: 24px;
+  font-weight: 500;
+  margin-bottom: 40px;
+  letter-spacing: 1px;
+}
+
+.descriptionBlock {
+  text-align: center;
+  color: #918181;
+  font-size: 18px;
+  font-weight: 400;
+  margin-bottom: 30px;
+}
+
+.listItem {
+  color: #CFCFCF;
+  font-weight: 500;
+  display: block;
+}
+
+.geoDescription {
+  text-align: center;
+  color: #918181;
+  font-size: 18px;
+}
+
+.footer {
+  width: 100%;
+  margin-bottom: 60px; 
+}
