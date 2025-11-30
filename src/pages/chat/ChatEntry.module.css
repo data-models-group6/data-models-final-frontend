@@ -1,0 +1,52 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: #121212;
+  padding: 20px;
+  overflow-y: auto; /* 整個頁面可直向捲動 */
+  padding-bottom: 100px; /* 避開 Bottom Bar */
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* 隱藏 Scrollbar */
+.container::-webkit-scrollbar { display: none; }
+.container { scrollbar-width: none; }
+
+.pageTitle {
+  color: white;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+/* 分區標題 */
+.sectionTitle {
+  color: #888;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 10px; /* 稍微縮小間距 */
+  letter-spacing: 0.5px;
+  margin-top: 24px; /* 分區之間拉開距離 */
+}
+.sectionTitle:first-of-type {
+  margin-top: 0; /* 第一個標題不用 margin-top */
+}
+
+/* ★ 關鍵修改：移除舊的橫向捲動樣式 (.newMatchesRow)
+   改用通用的列表容器
+*/
+.listContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 若無資料時的提示 */
+.emptyState {
+  color: #555;
+  font-size: 14px;
+  padding: 20px 0;
+  text-align: center;
+}
