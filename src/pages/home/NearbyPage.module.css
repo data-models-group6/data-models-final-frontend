@@ -1,0 +1,215 @@
+.container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-color: #121212;
+  overflow: hidden;
+}
+
+.contentWrapper {
+  width: 100%;
+  max-width: 480px;
+  height: 100%;
+  
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px;
+  position: relative;
+}
+
+.searchBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.searchText {
+  font-size: 14px;
+  color: #ccc;
+}
+
+.mapWrapper {
+  flex: 1;
+  width: 100%;
+  border-radius: 32px;
+  overflow: hidden; 
+  margin-bottom: 10px; 
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  min-height: 0; 
+}
+
+.mapContainer {
+  width: 100%;
+  height: 100%;
+  background-color: #e5e5e5; 
+}
+
+:global(.custom-avatar-icon) {
+  background: transparent;
+  border: none;
+}
+
+.avatarMarker {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.borderGreen { border: 4px solid #70BA65; z-index: 10; } /* 同一首歌 */
+.borderBlue { border: 4px solid #4A90E2; } /* 同歌手 */
+.borderWhite { border: 3px solid #FFFFFF; opacity: 0.9; } /* 一般路人 */
+
+.myMarkerContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.myAvatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  border: 3px solid #FFD700;
+  z-index: 100;
+  position: relative;
+}
+
+.pulseRing {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid #FFD700;
+  opacity: 0;
+  animation: pulseAnimation 2s infinite;
+}
+
+@keyframes pulseAnimation {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+.playerBar {
+  height: 80px;
+  flex-shrink: 0;
+  background-color: transparent;
+  color: white;
+  padding-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.playingTitle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: #ccc;
+}
+.trackInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.albumArt {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #333;
+}
+
+.userInfoCard {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;   
+  right: 16px;
+  
+  background-color: #404040;
+  border-radius: 24px;
+  padding: 20px;
+  z-index: 100;
+  
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+  animation: slideUp 0.3s ease-out;
+  
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cardAvatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  border: 2px solid white;
+}
+
+.cardName {
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+  font-style: italic; 
+}
+
+.cardInfo {
+  font-size: 14px;
+  color: #E0E0E0;
+  line-height: 1.6;
+}
+
+.cardActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.actionBtn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 20px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.actionBtn:active { opacity: 0.8; }
+
+.btnChat {
+  background-color: white;
+  color: black;
+}
+
+.btnClose {
+  background-color: #999;
+  color: black;
+}

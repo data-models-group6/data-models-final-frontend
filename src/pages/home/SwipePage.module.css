@@ -1,0 +1,174 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.tagsRow {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  z-index: 10;
+}
+
+.tag {
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1px solid #333;
+  color: #888;
+  font-size: 13px;
+  background-color: rgba(0,0,0,0.3);
+}
+
+.activeTag {
+  color: #38DB2F;
+  border-color: #70BA65;
+}
+
+.cardContainer {
+  width: 100%;
+  height: 60%; 
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.swipe {
+  position: absolute;
+  width: 70%;
+  height: 100%;
+  max-width: 360px;
+  cursor: grab; 
+  touch-action: none;
+}
+
+.swipe:active {
+  cursor: grabbing;
+}
+
+.card {
+  position: relative;
+  background-color: #fff;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -webkit-user-drag: none;
+}
+
+.cardContent {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 20px;
+  /* 由下往上的黑色漸層 */
+  background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 50%, transparent 100%);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nameAge {
+  font-size: 28px;
+  font-weight: 700;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.age {
+  font-size: 22px;
+  font-weight: 400;
+}
+
+.location {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #ddd;
+  margin-bottom: 8px;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: rgba(42, 172, 122, 0.2);
+  border: 1px solid rgba(42, 172, 122, 1);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  width: fit-content;
+  backdrop-filter: blur(4px);
+}
+
+.statusDot {
+  width: 4px;
+  height: 4px;
+  background-color: #2AAC7A;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #2AAC7A66;
+}
+
+.actionArea {
+  margin-top: 30px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.hintText {
+  color: #ccc;
+  font-size: 14px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.highlightGreen {
+  color: #70BA65;
+  font-weight: bold;
+}
+
+.buttonsRow {
+  display: flex;
+  gap: 30px;
+}
+
+.actionBtn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 28px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.actionBtn:active {
+  transform: scale(0.95);
+}
+
+.dislikeBtn { color: #E55C5C; }
+.likeBtn { color: #2AAC7A; }
