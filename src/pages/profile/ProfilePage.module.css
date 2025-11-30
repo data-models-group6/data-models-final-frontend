@@ -1,0 +1,83 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: #121212;
+  /* 這裡改回 20px，跟你的聊天頁面保持一致，避免標題太靠下 */
+  padding: 20px; 
+  color: white;
+  
+  max-width: 500px;
+  margin: 0 auto; 
+}
+
+/* --- 新增：標題樣式 --- */
+.pageTitle {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+  margin-bottom: 30px; /* 標題跟頭像拉開一點距離 */
+  /* 預設就是靠左，不需要額外設定 */
+}
+
+/* --- 頭像與名字 --- */
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.avatarWrapper {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-bottom: 16px;
+  border: 2px solid #333;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.name {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+/* --- 數據統計行 --- */
+.statsRow {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  padding: 0 10px; /* 稍微內縮一點避免貼邊 */
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+.statItem:active {
+  opacity: 0.7;
+}
+
+.statNumber {
+  font-size: 28px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.statLabel {
+  font-size: 14px;
+  color: #aaa;
+  font-weight: 400;
+}
