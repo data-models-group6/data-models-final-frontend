@@ -17,7 +17,15 @@ import AuthorizationSpotify from "./pages/authorization/AuthorizationSpotify";
 import AuthorizationLocation from "./pages/authorization/AuthorizationLocation";
 import MainLayout from "./components/MainLayout";
 import HomeLayout from "./components/homePage/HomeLayout";
-import SwipePage from "./components/homePage/SwipePage";
+import SwipePage from "./pages/home/SwipePage";
+import NearbyPage from "./pages/home/NearbyPage";
+import ExploreEntry from "./pages/home/ExploreEntry";
+import InteractionLayout from "./components/interactionPage/InteractionLayout";
+import LikesMePage from "./pages/interaction/LikesMePage";
+import MyMatchesPage from "./pages/interaction/MyMatchesPage";
+import MatchDetail from "./pages/interaction/MatchDetail";
+import ChatEntry from "./pages/chat/ChatEntry";
+import ProfilePage from "./pages/profile/ProfilePage";
 import "./index.css";
 
 const router = createBrowserRouter([
@@ -93,11 +101,11 @@ const router = createBrowserRouter([
                     },
                     {
                         path: "nearby",
-                        element: <SwipePage />,
+                        element: <NearbyPage />,
                     },
                     {
                         path: "explore",
-                        element: <SwipePage />,
+                        element: <ExploreEntry />,
                     },
                     {
                         path: "rank",
@@ -107,15 +115,29 @@ const router = createBrowserRouter([
             },
             {
                 path: "interaction",
-                element: <SwipePage />,
+                element: <InteractionLayout />,
+                children: [
+                    {
+                        path: "likes",
+                        element: <LikesMePage />,
+                    },
+                    {
+                        path: "mine",
+                        element: <MyMatchesPage />,
+                    },
+                ],
+            },
+            {
+                path: "interaction/likes/:userId",
+                element: <MatchDetail />,
             },
             {
                 path: "chat",
-                element: <SwipePage />,
+                element: <ChatEntry />,
             },
             {
                 path: "profile",
-                element: <SwipePage />,
+                element: <ProfilePage />,
             },
         ],
     },

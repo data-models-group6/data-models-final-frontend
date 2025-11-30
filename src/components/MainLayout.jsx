@@ -9,6 +9,7 @@ import classes from "./MainLayout.module.css";
 function MainLayout() {
     const location = useLocation();
     const isHomeActive = location.pathname.startsWith("/app/home");
+    const isInteractionActive = location.pathname.startsWith("/app/interaction");
 
     return (
         <div className={classes.container}>
@@ -27,9 +28,9 @@ function MainLayout() {
                     <TbCards />
                 </NavLink>
                 <NavLink
-                    to="/app/interaction"
-                    className={({ isActive }) =>
-                        isActive
+                    to="/app/interaction/likes"
+                    className={
+                        isInteractionActive
                             ? `${classes.navItem} ${classes.active}`
                             : classes.navItem
                     }
