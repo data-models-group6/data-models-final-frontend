@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react"; // 1. 引入 useRef
 import {
     MapContainer,
     TileLayer,
@@ -9,14 +9,14 @@ import {
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { IoSearch } from "react-icons/io5";
-import { FaPlay } from "react-icons/fa";
+import { FaPlay, FaMusic } from "react-icons/fa";
 import classes from "./NearbyPage.module.css";
+import { getCurrentTrack } from "../../utils/mapUtils";
 
-// 預設中心點 (台北信義區)，當作 fallback
 const DEFAULT_CENTER = [25.033964, 121.564472];
 
-// 假資料，之後用後端測試
 const mockUsers = [
+    // ... (保留原本的 Mock Users)
     {
         id: 1,
         name: "Amy",
@@ -66,7 +66,6 @@ function MapEventHandler({ onMapClick }) {
     return null;
 }
 
-// 讓地圖飛到指定位置
 function MapRecenter({ position }) {
     const map = useMap();
     useEffect(() => {
@@ -80,25 +79,61 @@ function MapRecenter({ position }) {
 const NearbyPage = () => {
     const [myPosition, setMyPosition] = useState(DEFAULT_CENTER);
     const [nearbyPeople, setNearbyPeople] = useState(mockUsers);
-    const [selectedUser, setSelectedUser] = useState(null); // 目前選中的人
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [playingTrack, setPlayingTrack] = useState(null);
 
-    // 一段時間固定抓取位置
+    const positionRef = useRef(DEFAULT_CENTER);
+
+    // 當 myPosition 改變時，只更新 Ref，不觸發 API
+    useEffect(() => {
+        positionRef.current = myPosition;
+    }, [myPosition]);
+
+    // GPS 定位
     useEffect(() => {
         if (!navigator.geolocation) return;
-
         const watchId = navigator.geolocation.watchPosition(
             (pos) => {
                 const { latitude, longitude } = pos.coords;
-                setMyPosition([latitude, longitude]); // 抓到後更新為真實位置
+                setMyPosition([latitude, longitude]);
             },
             (err) => console.error("GPS Error:", err),
             { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
         );
-
         return () => navigator.geolocation.clearWatch(watchId);
     }, []);
 
-    // 用來測試模擬其他人移動，之後可刪
+    // 音樂同步
+    useEffect(() => {
+        const syncMusic = async () => {
+            const currentLat = positionRef.current[0];
+            const currentLng = positionRef.current[1];
+
+            console.log(
+                "正在執行 Heartbeat，使用座標:",
+                currentLat,
+                currentLng
+            );
+
+            // 呼叫 API
+            const result = await getCurrentTrack(currentLat, currentLng);
+
+            if (result && result.status === "ok" && result.sent) {
+                console.log("抓到歌曲:", result.sent.track_name);
+                setPlayingTrack(result.sent);
+            } else {
+                console.log("沒在聽歌或 API 回傳空");
+                setPlayingTrack(null);
+            }
+        };
+
+        syncMusic();
+        const intervalId = setInterval(syncMusic, 15000);
+
+        return () => clearInterval(intervalId);
+    }, []);
+
+    // 模擬其他人移動 (保持不變)
     useEffect(() => {
         const interval = setInterval(() => {
             setNearbyPeople((prev) =>
@@ -112,13 +147,12 @@ const NearbyPage = () => {
         return () => clearInterval(interval);
     }, []);
 
+    // ... (createIcon 保持不變) ...
     const createIcon = (imgUrl, type, isMe) => {
-        // 根據 type 決定邊框顏色
         let borderClass = classes.borderWhite;
         if (type === "sameSong") borderClass = classes.borderGreen;
         if (type === "sameArtist") borderClass = classes.borderBlue;
 
-        // 自己的 Icon
         if (isMe) {
             return L.divIcon({
                 className: "custom-avatar-icon",
@@ -133,7 +167,6 @@ const NearbyPage = () => {
             });
         }
 
-        // 別人的 Icon
         return L.divIcon({
             className: "custom-avatar-icon",
             html: `<div class="${classes.avatarMarker} ${borderClass}" style="background-image: url('${imgUrl}');"></div>`,
@@ -149,6 +182,7 @@ const NearbyPage = () => {
                     <IoSearch size={22} />
                     <span className={classes.searchText}>附近正在聽什麼</span>
                 </div>
+
                 <div className={classes.mapWrapper}>
                     <MapContainer
                         center={DEFAULT_CENTER}
@@ -178,36 +212,73 @@ const NearbyPage = () => {
                                 icon={createIcon(user.img, user.type, false)}
                                 eventHandlers={{
                                     click: (e) => {
-                                        // 防止事件冒泡 (避免被 MapEventHandler 關掉)
                                         L.DomEvent.stopPropagation(
                                             e.originalEvent
                                         );
-                                        setSelectedUser(user); // 選中這個人
+                                        setSelectedUser(user);
                                     },
                                 }}
                             />
                         ))}
                     </MapContainer>
                 </div>
+
                 <div className={classes.playerBar}>
-                    <div className={classes.playingTitle}>
-                        我正在聽 <FaPlay size={10} style={{ marginLeft: 6 }} />
-                    </div>
-                    <div className={classes.trackInfo}>
-                        <img
-                            src="https://upload.wikimedia.org/wikipedia/en/4/45/Billie_Eilish_-_When_We_All_Fall_Asleep%2C_Where_Do_We_Go%3F.png"
-                            className={classes.albumArt}
-                        />
-                        <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: 14, fontWeight: "bold" }}>
-                                Bad Guy
+                    {playingTrack ? (
+                        <>
+                            <div className={classes.playingTitle}>
+                                我正在聽{" "}
+                                <FaPlay size={10} style={{ marginLeft: 6 }} />
                             </div>
-                            <div style={{ fontSize: 12, color: "#ccc" }}>
-                                Billie Eilish
+                            <div className={classes.trackInfo}>
+                                <img
+                                    src={playingTrack.album_image}
+                                    className={classes.albumArt}
+                                    alt="Album Art"
+                                />
+                                <div style={{ flex: 1, overflow: "hidden" }}>
+                                    <div
+                                        style={{
+                                            fontSize: 14,
+                                            fontWeight: "bold",
+                                            whiteSpace: "nowrap",
+                                            overflow: "hidden",
+                                            textOverflow: "ellipsis",
+                                        }}
+                                    >
+                                        {playingTrack.track_name}
+                                    </div>
+                                    <div
+                                        style={{
+                                            fontSize: 12,
+                                            color: "#ccc",
+                                            whiteSpace: "nowrap",
+                                            overflow: "hidden",
+                                            textOverflow: "ellipsis",
+                                        }}
+                                    >
+                                        {playingTrack.artist_name}
+                                    </div>
+                                </div>
                             </div>
+                        </>
+                    ) : (
+                        <div
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                height: "100%",
+                                color: "#888",
+                                fontSize: "14px",
+                            }}
+                        >
+                            <FaMusic size={18} style={{ marginRight: 10 }} />
+                            <span>請播放 Spotify 音樂以開始探索</span>
                         </div>
-                    </div>
+                    )}
                 </div>
+
                 {selectedUser && (
                     <div className={classes.userInfoCard}>
                         <div className={classes.cardHeader}>
@@ -227,7 +298,6 @@ const NearbyPage = () => {
                             <div>他也正在聽：{selectedUser.song}</div>
                         </div>
 
-                        {/* 按鈕 */}
                         <div className={classes.cardActions}>
                             <button
                                 className={`${classes.actionBtn} ${classes.btnChat}`}
