@@ -5,15 +5,13 @@ import { FaChevronLeft } from "react-icons/fa6";
 import AuthButton from "../../components/auth/AuthButton";
 import classes from "./SignUpGender.module.css";
 
-// 假設你未來會有照片，先定義好路徑 (目前用顏色代替)
-// import femaleImg from "../assets/female_avatar.png";
-// import maleImg from "../assets/male_avatar.png";
+const femaleImg = "https://avatar.iran.liara.run/public/girl";
+const maleImg = "https://avatar.iran.liara.run/public/boy";
 
 function SignUpGender() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // 1. 取得上一頁傳來的資料 (如果有用 navigate state 傳遞的話)
     const prevData = location.state || {};
 
     const [gender, setGender] = useState(null);
@@ -21,11 +19,7 @@ function SignUpGender() {
     const handleContinue = () => {
         if (!gender) return;
 
-        console.log("Previous Data:", prevData);
-        console.log("Selected Gender:", gender);
-
-        // 3. 把資料合併，傳去下一頁 (上傳照片頁)
-        navigate("/auth/signup/photo", {
+        navigate("/auth/signup/birthday", {
             state: { ...prevData, gender },
         });
     };
@@ -39,10 +33,11 @@ function SignUpGender() {
                 >
                     <FaChevronLeft />
                 </button>
-                <div className={classes.title}>性別選擇</div>
+                <div className={classes.title}>Select Gender</div>
             </header>
 
             <div className={classes.selectionArea}>
+                {/* 女性選項 */}
                 <div
                     className={classes.optionItem}
                     onClick={() => setGender("female")}
@@ -52,16 +47,23 @@ function SignUpGender() {
                             gender === "female" ? classes.circleSelected : ""
                         }`}
                     >
-                        {/* 未來放圖片的地方： <img src={femaleImg} ... /> */}
+                        {/* 這裡加入圖片 */}
+                        <img 
+                            src={femaleImg} 
+                            alt="Female" 
+                            className={classes.avatarImg} 
+                        />
                     </div>
                     <span
                         className={`${classes.label} ${
                             gender === "female" ? classes.labelSelected : ""
                         }`}
                     >
-                        女生
+                        Female
                     </span>
                 </div>
+
+                {/* 男性選項 */}
                 <div
                     className={classes.optionItem}
                     onClick={() => setGender("male")}
@@ -71,22 +73,27 @@ function SignUpGender() {
                             gender === "male" ? classes.circleSelected : ""
                         }`}
                     >
-                        {/* 未來放圖片的地方 */}
+                        <img 
+                            src={maleImg} 
+                            alt="Male" 
+                            className={classes.avatarImg} 
+                        />
                     </div>
                     <span
                         className={`${classes.label} ${
                             gender === "male" ? classes.labelSelected : ""
                         }`}
                     >
-                        男生
+                        Male
                     </span>
                 </div>
             </div>
+            
             <div className={classes.footer}>
                 <AuthButton
-                    label="繼續"
+                    label="Continue"
                     onClick={handleContinue}
-                    disabled={!gender}
+                    disabled={!gender} // 沒選性別時按鈕禁用
                     style={{
                         width: "75%",
                         margin: "0 auto",
