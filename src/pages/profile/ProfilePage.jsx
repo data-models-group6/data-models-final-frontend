@@ -2,12 +2,12 @@ import classes from "./ProfilePage.module.css";
 
 function ProfilePage() {
     const userData = {
-        name: "Rora",
-        avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80",
+        name: localStorage.getItem("myName"),
+        avatar: localStorage.getItem("avatar"),
         stats: {
-            likesMe: 2,
-            iLike: 2,
-            topPicks: 5,
+            likesMe: "X",
+            iLike: "X",
+            topPicks: "X",
         },
     };
 

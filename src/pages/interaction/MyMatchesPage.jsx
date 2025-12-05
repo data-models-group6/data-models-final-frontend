@@ -1,47 +1,80 @@
+// src/pages/interaction/MyMatchesPage.jsx
+import { useEffect, useState } from "react";
 import MatchCard from "../../components/interactionPage/MatchCard";
 import classes from "./MatchesGrid.module.css";
-
-// 假資料
-const dummyMatches = [
-    {
-        id: 4,
-        name: "Lena",
-        img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-    },
-    {
-        id: 5,
-        name: "Sarah",
-        img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-    },
-    {
-        id: 6,
-        name: "Jessica",
-        img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-    },
-    {
-        id: 7,
-        name: "Emily",
-        img: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-    },
-];
+import { fetchMyLikes } from "../../utils/interactionUtils"; // ← 看你實際放哪裡
 
 function MyMatchesPage() {
-    const handleChatClick = (id) => {
-        console.log("開始與 ID:", id, "聊天");
-        // navigate(`/app/chat/${id}`); // 未來可以這樣寫
-    };
+    const [matches, setMatches] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        async function loadMyMatches() {
+            try {
+                setLoading(true);
+                setError(null);
+
+                const data = await fetchMyLikes();
+                // 依你後端的格式做個安全一點的處理：
+                // 情境 1: { count, users: [...] }
+                // 情境 2: 直接回傳陣列 [ ... ]
+                let users = [];
+
+                if (Array.isArray(data)) {
+                    users = data;
+                } else if (Array.isArray(data.users)) {
+                    users = data.users;
+                }
+
+                const mapped = users.map((u) => ({
+                    id: u.user_id || u.id,
+                    name: u.display_name || u.name || "Guest",
+                    img: u.avatarUrl || u.avatar_url || u.img,
+                }));
+
+                setMatches(mapped);
+            } catch (err) {
+                console.error(err);
+                setError("載入我的配對失敗，請稍後再試。");
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        loadMyMatches();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className={classes.gridContainer}>
+                <div className={classes.emptyState}>
+                    <div className={classes.emptyText}>載入中…</div>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className={classes.gridContainer}>
+                <div className={classes.emptyState}>
+                    <div className={classes.emptyText}>{error}</div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className={classes.gridContainer}>
-            {dummyMatches.map((user) => (
+            {matches.map((user) => (
                 <MatchCard
                     key={user.id}
                     image={user.img}
-                    onClick={() => handleChatClick(user.id)}
                 />
             ))}
 
-            {dummyMatches.length === 0 && (
+            {matches.length === 0 && (
                 <div className={classes.emptyState}>
                     <div className={classes.emptyText}>暫無心動對象</div>
                     <p style={{ fontSize: "12px" }}>去配對看看吧！</p>

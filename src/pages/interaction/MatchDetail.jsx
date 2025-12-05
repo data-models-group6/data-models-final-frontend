@@ -1,67 +1,85 @@
-import { useParams, useNavigate } from "react-router-dom";
+// MatchDetail.jsx
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { FaEnvelope } from "react-icons/fa";
 import rippleBgImage from "../../assets/match.png";
 import failedImage from "../../assets/match_failed.png";
 import classes from "./MatchDetail.module.css";
 import { useEffect, useState } from "react";
-
-// 假資料庫 (模擬後端)
-const usersDb = {
-    1: {
-        name: "Kai",
-        img: "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-        matchRate: "82%",
-        distance: "150m",
-    },
-    2: {
-        name: "Jay",
-        img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-        matchRate: "95%",
-        distance: "2km",
-    },
-    // ... 其他
-};
-
-// 我的頭像 (固定)
-const MY_AVATAR =
-    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80";
+import { swipeUser } from "../../utils/interactionUtils";
 
 const MatchDetail = () => {
-    const { userId } = useParams();
+    const MY_AVATAR = localStorage.getItem("avatar");
+    const { userId } = useParams(); // 這裡是後端的 user_id (UUID)
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // 從上一頁帶過來的 user
+    const userFromState = location.state?.user;
 
     const [showFailed, setShowFailed] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
 
-    const handleGiveUp = () => {
-        setShowFailed(true);
+    // 如果沒有帶 state（例如直接打網址），就直接退回列表
+    useEffect(() => {
+        if (!userFromState) {
+            navigate("/app/interaction/likes", { replace: true });
+        }
+    }, [userFromState, navigate]);
+
+    if (!userFromState) {
+        return null; // 等上面的 redirect
+    }
+
+    const targetUser = {
+        name: userFromState.name,
+        img: userFromState.img,
     };
 
-    useEffect(() => {
-        let timer;
-        if (showFailed) {
-            // 顯示失敗畫面後，2 秒後自動跳回上一頁
-            timer = setTimeout(() => {
-                navigate(-1);
+    const backToList = () => {
+        navigate("/app/interaction/likes", { replace: true });
+    };
+
+    const handleGiveUp = async () => {
+        if (isProcessing) return;
+        try {
+            setIsProcessing(true);
+            await swipeUser(userId, "PASS");
+            setShowFailed(true);
+
+            // 顯示失敗畫面後，2 秒後自動回到列表
+            setTimeout(() => {
+                backToList();
             }, 2000);
+        } catch (err) {
+            console.error(err);
+            alert("放棄配對失敗，請稍後再試。");
+            setIsProcessing(false);
         }
-        return () => clearTimeout(timer);
-    }, [showFailed, navigate]);
+    };
+
+    const handleSayHi = async () => {
+        if (isProcessing) return;
+        try {
+            setIsProcessing(true);
+            const res = await swipeUser(userId, "LIKE");
+
+            if (res.is_match) {
+                // 這裡你可以改成跳到聊天室頁面
+                // navigate(`/app/chat/${res.match_id}`);
+                console.log("配對成功！match_id:", res.match_id);
+            }
+
+            // 不管成功與否，先回列表；列表會重新抓，這個人就消失了
+            backToList();
+        } catch (err) {
+            console.error(err);
+            alert("配對失敗，請稍後再試。");
+            setIsProcessing(false);
+        }
+    };
 
     const handleOverlayClick = () => {
-        navigate(-1);
-    };
-
-    // 根據 ID 找人，找不到就給預設值
-    const targetUser = usersDb[userId] || {
-        name: "Asahi",
-        img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-        matchRate: "82%",
-        distance: "150m",
-    };
-
-    const handleSayHi = () => {
-        console.log(`向 ${targetUser.name} 打招呼`);
-        // navigate("/app/chat/" + userId); // 之後可以導向聊天室
+        backToList();
     };
 
     return (
@@ -88,11 +106,11 @@ const MatchDetail = () => {
                 />
                 <div
                     className={`${classes.avatar} ${classes.avatarLeft}`}
-                    style={{ backgroundImage: `url(${targetUser.img})` }}
+                    style={{ backgroundImage: `url(${MY_AVATAR})` }}
                 ></div>
                 <div
                     className={`${classes.avatar} ${classes.avatarRight}`}
-                    style={{ backgroundImage: `url(${MY_AVATAR})` }}
+                    style={{ backgroundImage: `url(${targetUser.img})` }}
                 ></div>
             </div>
             <div className={classes.infoArea}>
@@ -106,20 +124,21 @@ const MatchDetail = () => {
                 <div className={classes.matchBadge}>★ 完美配對 ★</div>
 
                 <div className={classes.subInfo}>
-                    你們正在聆聽同一首歌
-                    <br />
-                    你們音樂品味 {targetUser.matchRate} 相似
-                    <br />
-                    {targetUser.distance}
+                    {/* 之後要顯示 match rate / distance 再從後端補欄位 */}
                 </div>
             </div>
             <div className={classes.actionArea}>
-                <button className={classes.btnPrimary} onClick={handleSayHi}>
+                <button
+                    className={classes.btnPrimary}
+                    onClick={handleSayHi}
+                    disabled={isProcessing}
+                >
                     <FaEnvelope /> 去打聲招呼吧
                 </button>
                 <button
                     className={classes.btnSecondary}
                     onClick={handleGiveUp}
+                    disabled={isProcessing}
                 >
                     放棄
                 </button>
