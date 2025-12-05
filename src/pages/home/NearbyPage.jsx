@@ -47,8 +47,7 @@ const buildNearbyUsers = (heartbeatData) => {
             type, // sameSong / sameArtist → 用來決定邊框顏色
             lat: item.lat,
             lng: item.lng,
-            // 目前就用專輯封面當頭貼
-            img: item.album_image,
+            img: item.avatarUrl,
             song: `${item.track_name} - ${item.artist_name}`,
             tags:
                 type === "sameSong"
@@ -171,10 +170,7 @@ const NearbyPage = () => {
         });
     };
 
-    // 自己的大頭貼：優先用正在播放歌曲的專輯封面，否則用預設頭像
-    const myAvatarImg =
-        playingTrack?.album_image ||
-        "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit";
+    const myAvatarImg = localStorage.getItem("avatar");
 
     return (
         <div className={classes.container}>
