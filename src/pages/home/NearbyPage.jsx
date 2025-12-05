@@ -36,31 +36,43 @@ function MapRecenter({ position }) {
 const buildNearbyUsers = (heartbeatData) => {
     if (!heartbeatData || heartbeatData.message) return [];
 
-    const { same_track = [], same_artist = [] } = heartbeatData;
+    const { same_track = [], same_artist = [], near = [] } = heartbeatData;
 
     const mapHeartbeat = (item, kind) => {
-        const type = kind === "same_track" ? "sameSong" : "sameArtist";
+        let type;
+        let tags;
+
+        if (kind === "same_track") {
+            type = "sameSong";
+            tags = "完美同頻 · 正在聽同一首歌";
+        } else if (kind === "same_artist") {
+            type = "sameArtist";
+            tags = `同歌手 · 都在聽 ${item.artist_name}`;
+        } else {
+            // kind === "near"
+            type = "nearby";
+            tags = "附近 · 正在聽不同的音樂";
+        }
 
         return {
             id: item.user_id,
             name: item.display_name,
-            type, // sameSong / sameArtist → 用來決定邊框顏色
+            type, // sameSong / sameArtist / nearby → 用來決定邊框顏色
             lat: item.lat,
             lng: item.lng,
             img: item.avatarUrl,
             song: `${item.track_name} - ${item.artist_name}`,
-            tags:
-                type === "sameSong"
-                    ? "完美同頻 · 正在聽同一首歌"
-                    : `同歌手 · 都在聽 ${item.artist_name}`,
+            tags,
         };
     };
 
     return [
         ...same_track.map((u) => mapHeartbeat(u, "same_track")),
         ...same_artist.map((u) => mapHeartbeat(u, "same_artist")),
+        ...near.map((u) => mapHeartbeat(u, "near")),
     ];
 };
+
 
 const NearbyPage = () => {
     const [myPosition, setMyPosition] = useState(DEFAULT_CENTER);
@@ -147,6 +159,7 @@ const NearbyPage = () => {
         let borderClass = classes.borderWhite;
         if (type === "sameSong") borderClass = classes.borderGreen;
         if (type === "sameArtist") borderClass = classes.borderBlue;
+        if (type === "nearby") borderClass = classes.borderGray;
 
         if (isMe) {
             return L.divIcon({
