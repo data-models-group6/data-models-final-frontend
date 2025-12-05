@@ -36,7 +36,7 @@ function MapRecenter({ position }) {
 const buildNearbyUsers = (heartbeatData) => {
     if (!heartbeatData || heartbeatData.message) return [];
 
-    const { same_track = [], same_artist = [], near = [] } = heartbeatData;
+    const { same_track = [], same_artist = [], just_near = [] } = heartbeatData;
 
     const mapHeartbeat = (item, kind) => {
         let type;
@@ -49,7 +49,7 @@ const buildNearbyUsers = (heartbeatData) => {
             type = "sameArtist";
             tags = `同歌手 · 都在聽 ${item.artist_name}`;
         } else {
-            // kind === "near"
+            // just_near → nearby
             type = "nearby";
             tags = "附近 · 正在聽不同的音樂";
         }
@@ -57,7 +57,7 @@ const buildNearbyUsers = (heartbeatData) => {
         return {
             id: item.user_id,
             name: item.display_name,
-            type, // sameSong / sameArtist / nearby → 用來決定邊框顏色
+            type, // sameSong / sameArtist / nearby
             lat: item.lat,
             lng: item.lng,
             img: item.avatarUrl,
@@ -69,10 +69,9 @@ const buildNearbyUsers = (heartbeatData) => {
     return [
         ...same_track.map((u) => mapHeartbeat(u, "same_track")),
         ...same_artist.map((u) => mapHeartbeat(u, "same_artist")),
-        ...near.map((u) => mapHeartbeat(u, "near")),
+        ...just_near.map((u) => mapHeartbeat(u, "near")),
     ];
 };
-
 
 const NearbyPage = () => {
     const [myPosition, setMyPosition] = useState(DEFAULT_CENTER);
