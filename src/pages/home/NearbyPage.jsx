@@ -43,8 +43,7 @@ const buildNearbyUsers = (heartbeatData) => {
 
         return {
             id: item.user_id,
-            // 先暫時用 user_id 前 6 碼當名字，之後後端如果有暱稱再改
-            name: item.user_id.slice(0, 6),
+            name: item.display_name,
             type, // sameSong / sameArtist → 用來決定邊框顏色
             lat: item.lat,
             lng: item.lng,
@@ -307,7 +306,7 @@ const NearbyPage = () => {
                             <button
                                 className={`${classes.actionBtn} ${classes.btnChat}`}
                             >
-                                聊天
+                                配對
                             </button>
                             <button
                                 className={`${classes.actionBtn} ${classes.btnClose}`}
