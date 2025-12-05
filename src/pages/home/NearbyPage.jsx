@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react"; // 1. 引入 useRef
+import React, { useState, useEffect, useRef } from "react";
 import {
     MapContainer,
     TileLayer,
@@ -14,50 +14,6 @@ import classes from "./NearbyPage.module.css";
 import { getCurrentTrack } from "../../utils/mapUtils";
 
 const DEFAULT_CENTER = [25.033964, 121.564472];
-
-const mockUsers = [
-    // ... (保留原本的 Mock Users)
-    {
-        id: 1,
-        name: "Amy",
-        type: "sameSong",
-        lat: 25.034,
-        lng: 121.565,
-        img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=80",
-        song: "Bad Guy - Billie Eilish",
-        tags: "完美同頻 · 正在聽同一首歌",
-    },
-    {
-        id: 2,
-        name: "John",
-        type: "sameArtist",
-        lat: 25.033,
-        lng: 121.563,
-        img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=80",
-        song: "Lovely - Billie Eilish",
-        tags: "同歌手 · 都在聽 Billie Eilish",
-    },
-    {
-        id: 3,
-        name: "Jeno",
-        type: "normal",
-        lat: 25.035,
-        lng: 121.566,
-        img: "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=80",
-        song: "Happier Than Ever",
-        tags: "一般使用者 · 正在聽其他歌曲",
-    },
-    {
-        id: 4,
-        name: "Erica",
-        type: "normal",
-        lat: 25.032,
-        lng: 121.562,
-        img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=80",
-        song: "Ocean Eyes",
-        tags: "一般使用者 · 正在聽其他歌曲",
-    },
-];
 
 function MapEventHandler({ onMapClick }) {
     useMapEvents({
@@ -76,15 +32,47 @@ function MapRecenter({ position }) {
     return null;
 }
 
+// 把後端 heartbeat 資料轉成 NearbyPage 需要的格式
+const buildNearbyUsers = (heartbeatData) => {
+    if (!heartbeatData || heartbeatData.message) return [];
+
+    const { same_track = [], same_artist = [] } = heartbeatData;
+
+    const mapHeartbeat = (item, kind) => {
+        const type = kind === "same_track" ? "sameSong" : "sameArtist";
+
+        return {
+            id: item.user_id,
+            // 先暫時用 user_id 前 6 碼當名字，之後後端如果有暱稱再改
+            name: item.user_id.slice(0, 6),
+            type, // sameSong / sameArtist → 用來決定邊框顏色
+            lat: item.lat,
+            lng: item.lng,
+            // 目前就用專輯封面當頭貼
+            img: item.album_image,
+            song: `${item.track_name} - ${item.artist_name}`,
+            tags:
+                type === "sameSong"
+                    ? "完美同頻 · 正在聽同一首歌"
+                    : `同歌手 · 都在聽 ${item.artist_name}`,
+        };
+    };
+
+    return [
+        ...same_track.map((u) => mapHeartbeat(u, "same_track")),
+        ...same_artist.map((u) => mapHeartbeat(u, "same_artist")),
+    ];
+};
+
 const NearbyPage = () => {
     const [myPosition, setMyPosition] = useState(DEFAULT_CENTER);
-    const [nearbyPeople, setNearbyPeople] = useState(mockUsers);
+    const [nearbyPeople, setNearbyPeople] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
     const [playingTrack, setPlayingTrack] = useState(null);
 
+    // 用 ref 存座標，避免每次 setState 都觸發 effect
     const positionRef = useRef(DEFAULT_CENTER);
 
-    // 當 myPosition 改變時，只更新 Ref，不觸發 API
     useEffect(() => {
         positionRef.current = myPosition;
     }, [myPosition]);
@@ -92,6 +80,7 @@ const NearbyPage = () => {
     // GPS 定位
     useEffect(() => {
         if (!navigator.geolocation) return;
+
         const watchId = navigator.geolocation.watchPosition(
             (pos) => {
                 const { latitude, longitude } = pos.coords;
@@ -100,54 +89,62 @@ const NearbyPage = () => {
             (err) => console.error("GPS Error:", err),
             { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
         );
+
         return () => navigator.geolocation.clearWatch(watchId);
     }, []);
 
-    // 音樂同步
+    // 音樂同步 + 取得附近使用者
     useEffect(() => {
         const syncMusic = async () => {
             const currentLat = positionRef.current[0];
             const currentLng = positionRef.current[1];
 
-            console.log(
-                "正在執行 Heartbeat，使用座標:",
-                currentLat,
-                currentLng
-            );
+            console.log("正在執行 Heartbeat，座標:", currentLat, currentLng);
 
-            // 呼叫 API
             const result = await getCurrentTrack(currentLat, currentLng);
 
-            if (result && result.status === "ok" && result.sent) {
+            // token 不在 / API error 等情況
+            if (!result) {
+                console.log("Heartbeat 回傳空或錯誤");
+                setPlayingTrack(null);
+                setNearbyPeople([]);
+                return;
+            }
+
+            // 後端說「目前沒有在聽歌」
+            if (result.message) {
+                console.log(result.message);
+                setPlayingTrack(null);
+                setNearbyPeople([]);
+                return;
+            }
+
+            // 正常成功：{ status, sent, same_track, same_artist }
+            if (result.status === "ok" && result.sent) {
                 console.log("抓到歌曲:", result.sent.track_name);
                 setPlayingTrack(result.sent);
+
+                const users = buildNearbyUsers(result);
+                setNearbyPeople(users);
+                console.log("附近使用者:", users);
+
+                // 如果有開著 bottom card，避免點到已經不存在的人
+                setSelectedUser((prev) =>
+                    prev && users.find((u) => u.id === prev.id) ? prev : null
+                );
             } else {
-                console.log("沒在聽歌或 API 回傳空");
+                console.log("API 回傳非 ok 狀態:", result);
                 setPlayingTrack(null);
+                setNearbyPeople([]);
             }
         };
 
         syncMusic();
         const intervalId = setInterval(syncMusic, 15000);
-
         return () => clearInterval(intervalId);
     }, []);
 
-    // 模擬其他人移動 (保持不變)
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setNearbyPeople((prev) =>
-                prev.map((user) => ({
-                    ...user,
-                    lat: user.lat + (Math.random() - 0.5) * 0.0005,
-                    lng: user.lng + (Math.random() - 0.5) * 0.0005,
-                }))
-            );
-        }, 3000);
-        return () => clearInterval(interval);
-    }, []);
-
-    // ... (createIcon 保持不變) ...
+    // 建立 Leaflet 自訂 Icon
     const createIcon = (imgUrl, type, isMe) => {
         let borderClass = classes.borderWhite;
         if (type === "sameSong") borderClass = classes.borderGreen;
@@ -175,6 +172,11 @@ const NearbyPage = () => {
         });
     };
 
+    // 自己的大頭貼：優先用正在播放歌曲的專輯封面，否則用預設頭像
+    const myAvatarImg =
+        playingTrack?.album_image ||
+        "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit";
+
     return (
         <div className={classes.container}>
             <div className={classes.contentWrapper}>
@@ -196,15 +198,15 @@ const NearbyPage = () => {
                             onMapClick={() => setSelectedUser(null)}
                         />
                         {myPosition && <MapRecenter position={myPosition} />}
+
+                        {/* 自己的位置 */}
                         <Marker
                             position={myPosition}
-                            icon={createIcon(
-                                "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=80",
-                                null,
-                                true
-                            )}
+                            icon={createIcon(myAvatarImg, null, true)}
                             zIndexOffset={1000}
                         />
+
+                        {/* 附近的人 */}
                         {nearbyPeople.map((user) => (
                             <Marker
                                 key={user.id}
@@ -223,6 +225,7 @@ const NearbyPage = () => {
                     </MapContainer>
                 </div>
 
+                {/* 下方播放器 bar */}
                 <div className={classes.playerBar}>
                     {playingTrack ? (
                         <>
@@ -279,6 +282,7 @@ const NearbyPage = () => {
                     )}
                 </div>
 
+                {/* 點 marker 後的底部資訊卡 */}
                 {selectedUser && (
                     <div className={classes.userInfoCard}>
                         <div className={classes.cardHeader}>
@@ -293,6 +297,7 @@ const NearbyPage = () => {
                             </div>
                         </div>
                         <div className={classes.cardInfo}>
+                            {/* 距離目前先寫死 80 公尺，之後可以用 lat/lng 算真實距離 */}
                             <div>距離你約 80 公尺</div>
                             <div>{selectedUser.tags}</div>
                             <div>他也正在聽：{selectedUser.song}</div>
