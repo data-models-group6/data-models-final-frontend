@@ -149,7 +149,7 @@ const NearbyPage = () => {
         };
 
         syncMusic();
-        const intervalId = setInterval(syncMusic, 15000);
+        const intervalId = setInterval(syncMusic, 8000);
         return () => clearInterval(intervalId);
     }, []);
 
