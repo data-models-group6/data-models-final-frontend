@@ -210,7 +210,7 @@ const NearbyPage = () => {
                         <Marker
                             position={myPosition}
                             icon={createIcon(myAvatarImg, null, true)}
-                            zIndexOffset={1000}
+                            zIndexOffset={10}
                         />
 
                         {/* 附近的人 */}
@@ -219,6 +219,7 @@ const NearbyPage = () => {
                                 key={user.id}
                                 position={[user.lat, user.lng]}
                                 icon={createIcon(user.img, user.type, false)}
+                                zIndexOffset={999}
                                 eventHandlers={{
                                     click: (e) => {
                                         L.DomEvent.stopPropagation(
