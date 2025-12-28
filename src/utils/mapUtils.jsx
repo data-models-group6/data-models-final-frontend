@@ -30,3 +30,36 @@ export const getCurrentTrack = async (lat, lng) => {
     return null;
   }
 };
+const API_BASE_URL = window.location.hostname === "localhost"
+  ? "http://127.0.0.1:8000/api"
+  : "https://data-models-final-backend.onrender.com/api";
+
+
+export const getRegionalRanking = async (lat, lng) => {
+  try {
+    const token = localStorage.getItem("authToken");
+
+    const response = await fetch(
+      `${API_BASE_URL}/ranking/regional`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ lat, lng }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return data;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("getRegionalRanking Error:", error);
+    return { status: "error", message: error.message || "Network error" };
+  }
+};

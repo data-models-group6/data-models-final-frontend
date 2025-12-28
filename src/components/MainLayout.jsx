@@ -3,10 +3,12 @@ import { TbCards } from "react-icons/tb";
 import { BsGridFill } from "react-icons/bs";
 import { IoChatbubbleEllipses } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
+import useHistorySync from "../hooks/useHistorySync";
 
 import classes from "./MainLayout.module.css";
 
 function MainLayout() {
+    useHistorySync();
     const location = useLocation();
     const isHomeActive = location.pathname.startsWith("/app/home");
     const isInteractionActive = location.pathname.startsWith("/app/interaction");

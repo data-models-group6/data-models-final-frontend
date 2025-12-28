@@ -27,6 +27,7 @@ import MatchDetail from "./pages/interaction/MatchDetail";
 import ChatEntry from "./pages/chat/ChatEntry";
 import ProfilePage from "./pages/profile/ProfilePage";
 import "./index.css";
+import RegionalRankingPage from "./pages/home/RegionalRankingPage";
 
 const router = createBrowserRouter([
     {
@@ -109,7 +110,7 @@ const router = createBrowserRouter([
                     },
                     {
                         path: "rank",
-                        element: <SwipePage />,
+                        element: <RegionalRankingPage />,
                     },
                 ],
             },
