@@ -1,3 +1,9 @@
+# 1.安裝依賴套件
+npm install
+
+# 2.啟動伺服器
+npm run dev
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
